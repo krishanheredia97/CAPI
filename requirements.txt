@@ -1,0 +1,8 @@
+click
+pyperclip
+setuptools
+openai
+python-dotenv
+termcolor
+prompt_toolkit
+jsonpath_ng

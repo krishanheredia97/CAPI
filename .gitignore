@@ -1,0 +1,7 @@
+__pycache__
+capi.egg-info
+prompting
+venv
+.env
+debugging
+utils
