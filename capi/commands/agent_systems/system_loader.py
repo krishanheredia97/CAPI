@@ -7,7 +7,7 @@ from ...utils.llm_api_caller import LLMApiCaller
 
 def load_workflow(workflow_name: str) -> Dict[str, Any]:
     """Load and validate a workflow from JSON file"""
-    workflow_path = Path(f"prompting/cli/{workflow_name}.json")
+    workflow_path = Path(f"capi/commands/agent_systems/workflows/{workflow_name}.json")
     
     if not workflow_path.exists():
         raise FileNotFoundError(f"Workflow file not found: {workflow_path}")

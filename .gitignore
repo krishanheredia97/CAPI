@@ -5,3 +5,4 @@ venv
 .env
 debugging
 utils
+capi/commands/agent_systems/workflows
