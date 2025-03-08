@@ -28,14 +28,14 @@ def copy_code_context(src_dir: str, include_files: bool, include_structure: bool
         files_content = []
         all_files = []
         
-        for root, dirs, files in os.walk(src_dir):
+        for prompt, dirs, files in os.walk(src_dir):
             dirs[:] = [d for d in dirs if not should_ignore(
-                os.path.relpath(os.path.join(root, d), src_dir), 
+                os.path.relpath(os.path.join(prompt, d), src_dir), 
                 ignore_patterns + always_ignore
             )]
             
             for file in files:
-                filepath = os.path.join(root, file)
+                filepath = os.path.join(prompt, file)
                 rel_path = os.path.relpath(filepath, src_dir)
                 if not should_ignore(rel_path, ignore_patterns + always_ignore):
                     if not is_binary_file(filepath):

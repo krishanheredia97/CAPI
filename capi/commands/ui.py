@@ -13,8 +13,8 @@ from ..utils.file_utils import (
 from ..utils.structure_utils import generate_directory_structure
 
 class FileTreeView:
-    def __init__(self, root_dir, include_structure=1):
-        self.root_dir = os.path.abspath(root_dir)
+    def __init__(self, prompt_dir, include_structure=1):
+        self.prompt_dir = os.path.abspath(prompt_dir)
         self.include_structure = include_structure
         self.window = tk.Tk()
         self.window.title("Select Files")
@@ -109,7 +109,7 @@ class FileTreeView:
         status_label.pack(pady=5)
         
         # Get ignore patterns
-        self.ignore_patterns = get_gitignore_patterns(self.root_dir)
+        self.ignore_patterns = get_gitignore_patterns(self.prompt_dir)
         self.always_ignore = ['venv', '__pycache__', '.git', 'node_modules', '.gitignore', 'capi.egg-info']
         
         # Initialize selected items tracking
@@ -134,13 +134,13 @@ class FileTreeView:
         """Cache all valid files and directories"""
         self.all_files = []
         self.all_dirs = []
-        for root, dirs, files in os.walk(self.root_dir):
-            rel_root = os.path.relpath(root, self.root_dir)
+        for prompt, dirs, files in os.walk(self.prompt_dir):
+            rel_prompt = os.path.relpath(prompt, self.prompt_dir)
             
             # Filter directories
             filtered_dirs = []
             for d in dirs:
-                dir_path = os.path.join(rel_root, d)
+                dir_path = os.path.join(rel_prompt, d)
                 if not should_ignore(dir_path, self.ignore_patterns + self.always_ignore):
                     filtered_dirs.append(d)
                     if dir_path != '.':
@@ -149,8 +149,8 @@ class FileTreeView:
             
             # Filter files
             for f in files:
-                file_path = os.path.join(rel_root, f)
-                full_path = os.path.join(root, f)
+                file_path = os.path.join(rel_prompt, f)
+                full_path = os.path.join(prompt, f)
                 if not should_ignore(file_path, self.ignore_patterns + self.always_ignore):
                     if not is_binary_file(full_path):
                         self.all_files.append(file_path)
@@ -188,13 +188,13 @@ class FileTreeView:
                     matched_paths.add(current_dir)
                     current_dir = os.path.dirname(current_dir)
         
-        # Add root if we have matches
+        # Add prompt if we have matches
         if matched_paths:
-            root_item = self.add_item('', os.path.basename(self.root_dir), self.root_dir, True)
-            self.add_filtered_contents(root_item, self.root_dir, matched_paths)
+            prompt_item = self.add_item('', os.path.basename(self.prompt_dir), self.prompt_dir, True)
+            self.add_filtered_contents(prompt_item, self.prompt_dir, matched_paths)
             
             # Expand all items
-            for item in self.get_all_children(root_item):
+            for item in self.get_all_children(prompt_item):
                 self.tree.item(item, open=True)
 
     def add_filtered_contents(self, parent_item, parent_path, matched_paths):
@@ -206,7 +206,7 @@ class FileTreeView:
             
             for item in sorted(os.listdir(parent_path)):
                 item_path = os.path.join(parent_path, item)
-                rel_path = os.path.relpath(item_path, self.root_dir)
+                rel_path = os.path.relpath(item_path, self.prompt_dir)
                 
                 if should_ignore(rel_path, self.ignore_patterns + self.always_ignore):
                     continue
@@ -226,7 +226,7 @@ class FileTreeView:
             # Then add files
             for name, file_path in files:
                 file_item = self.add_item(parent_item, name, file_path, False)
-                rel_path = os.path.relpath(file_path, self.root_dir)
+                rel_path = os.path.relpath(file_path, self.prompt_dir)
                 
                 # Apply appropriate tags
                 tags = []
@@ -265,7 +265,7 @@ class FileTreeView:
             files = []
             for item in items:
                 item_path = os.path.join(parent_path, item)
-                rel_path = os.path.relpath(item_path, self.root_dir)
+                rel_path = os.path.relpath(item_path, self.prompt_dir)
                 
                 if should_ignore(rel_path, self.ignore_patterns + self.always_ignore):
                     continue
@@ -286,7 +286,7 @@ class FileTreeView:
                 file_path = os.path.join(parent_path, f)
                 file_item = self.add_item(parent_item, f, file_path, False)
                 # Check if file is selected
-                rel_path = os.path.relpath(file_path, self.root_dir)
+                rel_path = os.path.relpath(file_path, self.prompt_dir)
                 if rel_path in self.selected_paths:
                     self.tree.item(file_item, tags=('selected',))
                 
@@ -298,14 +298,14 @@ class FileTreeView:
         for item in self.tree.get_children():
             self.tree.delete(item)
         
-        # Add root directory
-        root_name = os.path.basename(self.root_dir)
-        root_item = self.add_item('', root_name, self.root_dir, True)
+        # Add prompt directory
+        prompt_name = os.path.basename(self.prompt_dir)
+        prompt_item = self.add_item('', prompt_name, self.prompt_dir, True)
         
-        self.add_directory_contents(root_item, self.root_dir)
+        self.add_directory_contents(prompt_item, self.prompt_dir)
         
         # Expand all items
-        for item in self.get_all_children(root_item):
+        for item in self.get_all_children(prompt_item):
             self.tree.item(item, open=True)
 
     def on_click(self, event):
@@ -327,7 +327,7 @@ class FileTreeView:
     def toggle_select(self, item):
         """Toggle selection state of an item"""
         item_path = self.get_item_path(item)
-        rel_path = os.path.relpath(item_path, self.root_dir)
+        rel_path = os.path.relpath(item_path, self.prompt_dir)
         
         if os.path.isfile(item_path):
             if rel_path in self.selected_paths:
@@ -361,7 +361,7 @@ class FileTreeView:
         while item:
             path_parts.insert(0, self.tree.item(item)['text'])
             item = self.tree.parent(item)
-        return os.path.join(self.root_dir, *path_parts[1:]) if len(path_parts) > 1 else self.root_dir
+        return os.path.join(self.prompt_dir, *path_parts[1:]) if len(path_parts) > 1 else self.prompt_dir
 
     def get_selected_files(self):
         """Return list of selected file paths"""
@@ -387,7 +387,7 @@ class FileTreeView:
         
         # Add selected files content
         for file in sorted(selected_files):
-            full_path = os.path.join(self.root_dir, file)
+            full_path = os.path.join(self.prompt_dir, file)
             content = get_file_contents(full_path)
             if content is not None:
                 output.append(f"```{file}\n{content}\n```")
@@ -397,13 +397,13 @@ class FileTreeView:
         
         # Add structure section if requested
         if self.include_structure_var.get():
-            structure = generate_directory_structure(self.root_dir, self.ignore_patterns, self.always_ignore)
+            structure = generate_directory_structure(self.prompt_dir, self.ignore_patterns, self.always_ignore)
             # Don't JSON serialize the structure - just add it directly
             output.append(f"\n{structure}")
             
         # Add context if requested
         if self.include_context_var.get():
-            ctx_path = Path(self.root_dir) / 'prompting' / 'cli' / 'ctx.xml'
+            ctx_path = Path(self.prompt_dir) / 'prompting' / 'cli' / 'ctx.xml'
             if ctx_path.exists():
                 try:
                     with open(ctx_path, 'r', encoding='utf-8') as f:
@@ -430,15 +430,15 @@ class FileTreeView:
         self.window.destroy()
 
         # Save selection for again
-        selection_file = os.path.join(self.root_dir, 'prompting', 'cli', 'last_selection.json')
+        selection_file = os.path.join(self.prompt_dir, 'prompting', 'cli', 'last_selection.json')
         if os.path.exists(os.path.dirname(selection_file)):
             with open(selection_file, 'w') as f:
                 json.dump({"files": selected_files}, f)
 
-def open_ui(root_dir, include_structure=1):
+def open_ui(prompt_dir, include_structure=1):
     """Open the UI selector"""
-    if root_dir == '.':
-        root_dir = os.getcwd()
+    if prompt_dir == '.':
+        prompt_dir = os.getcwd()
     
-    app = FileTreeView(root_dir, include_structure)
+    app = FileTreeView(prompt_dir, include_structure)
     app.window.mainloop()

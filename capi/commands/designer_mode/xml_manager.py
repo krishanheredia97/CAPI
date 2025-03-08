@@ -6,7 +6,7 @@ from prompt_toolkit.formatted_text import HTML
 
 class XMLManager:
     def __init__(self):
-        self.root = ET.Element("root")
+        self.prompt = ET.Element("prompt")
         self._current_path = []  # Use underscore prefix for private attribute
         self.depth_colors = [
             '#ff8c00',  # Base orange
@@ -26,7 +26,7 @@ class XMLManager:
     def get_prompt(self):
         prompt_parts = []
         if not self._current_path:
-            prompt_parts.append(f'<style fg="{self.depth_colors[0]}">root</style>')
+            prompt_parts.append(f'<style fg="{self.depth_colors[0]}">prompt</style>')
         else:
             for i, element in enumerate(self._current_path):
                 color = self.depth_colors[min(i, len(self.depth_colors)-1)]
@@ -34,11 +34,11 @@ class XMLManager:
         return HTML("> ".join(prompt_parts) + "> ")
 
     def reset(self):
-        self.root = ET.Element("root")
+        self.prompt = ET.Element("prompt")
         self._current_path = []
 
     def _get_current_element(self):
-        return self._current_path[-1] if self._current_path else self.root
+        return self._current_path[-1] if self._current_path else self.prompt
 
     def list_tags(self):
         current_element = self._get_current_element()
@@ -54,7 +54,7 @@ class XMLManager:
         if tag_name == "..":
             if self._current_path:
                 self._current_path.pop()
-                print(f"Moved back to <{self._get_current_element().tag if self._get_current_element() else 'root'}>")
+                print(f"Moved back to <{self._get_current_element().tag if self._get_current_element() else 'prompt'}>")
         else:
             current_element = self._get_current_element()
             found = any(child.tag == tag_name for child in current_element)
@@ -64,7 +64,7 @@ class XMLManager:
             else:
                 print(f"Error: Tag <{tag_name}> not found.")
 
-    def go_to_root(self):
+    def go_to_prompt(self):
         self._current_path = []
 
     def create_element(self, command):
@@ -98,16 +98,16 @@ class XMLManager:
             print(f"Error creating element: {str(e)}")
 
     def save(self):
-        if self.root is None:
+        if self.prompt is None:
             print("Error: No tags to save.")
             return
             
-        if len(self.root) == 0:
+        if len(self.prompt) == 0:
             print("Error: No tags to save.")
             return
             
-        if len(self.root) > 1:
-            print("Error: Multiple root tags found. Cannot save.")
+        if len(self.prompt) > 1:
+            print("Error: Multiple prompt tags found. Cannot save.")
             return
 
         cli_dir = os.path.join(os.getcwd(), "prompting", "cli")
@@ -115,18 +115,18 @@ class XMLManager:
             print("Error: 'prompting/cli' directory not found. Run 'capi init' first.")
             return
 
-        file_name = f"{next(iter(self.root)).tag}.xml"
+        file_name = f"{next(iter(self.prompt)).tag}.xml"
         file_path = os.path.join(cli_dir, file_name)
         
         try:
             with open(file_path, "w", encoding='utf-8') as f:
-                f.write(self._pretty_print_xml(self.root))
+                f.write(self._pretty_print_xml(self.prompt))
             print(f"Saved prompt to {file_path}")
         except Exception as e:
             print(f"Error saving file: {str(e)}")
     
     def show(self):
-        current_element = self._get_current_element() if self.current_path else self.root
+        current_element = self._get_current_element() if self.current_path else self.prompt
         if current_element is None:
             return
         print(self._pretty_print_xml(current_element, trunc_max_chars=100))
@@ -208,7 +208,7 @@ class XMLManager:
         return existing_tags
     
     def get_full_content(self) -> str:
-        return self._pretty_print_xml(self.root, trunc_max_chars=None)
+        return self._pretty_print_xml(self.prompt, trunc_max_chars=None)
 
     def edit_with_nano(self):
         import tempfile

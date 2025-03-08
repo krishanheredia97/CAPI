@@ -2,13 +2,13 @@ import os
 import json
 import click
 
-def init_cli(root_dir):
+def init_cli(prompt_dir):
     """Initialize CLI configuration."""
-    if root_dir == '.':
-        root_dir = os.getcwd()
+    if prompt_dir == '.':
+        prompt_dir = os.getcwd()
 
     # Create prompting/cli directory
-    cli_dir = os.path.join(root_dir, 'prompting', 'cli')
+    cli_dir = os.path.join(prompt_dir, 'prompting', 'cli')
     os.makedirs(cli_dir, exist_ok=True)
 
     # Create empty last_selection.json

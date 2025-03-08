@@ -25,7 +25,7 @@ class PromptManager:
 
     def run(self):
         print("🔨 Prompt Designer Mode")
-        print("Available commands: nt <tag-name> [\"content\"], paste <tag-name>, ct <tag-name>, ls, show, root, cls, clear, save, copy, exit, fbm, nano")
+        print("Available commands: nt <tag-name> [\"content\"], paste <tag-name>, ct <tag-name>, ls, show, prompt, cls, clear, save, copy, exit, fbm, nano")
 
 
         while True:
@@ -56,8 +56,8 @@ class PromptManager:
                     self.xml_manager.list_tags()
                 elif command == "show":
                     self.xml_manager.show()
-                elif command == "root":
-                    self.xml_manager.go_to_root()
+                elif command == "prompt":
+                    self.xml_manager.go_to_prompt()
                 elif command == "save":
                     self.xml_manager.save()
                 elif command.startswith("term "):
@@ -69,7 +69,7 @@ class PromptManager:
                 elif command == "nano":
                     self.xml_manager.edit_with_nano()
                 else:
-                    print("Available commands: nt <tag-name> [\"content\"], paste <tag-name>, ct <tag-name>, ls, show, root, cls, clear, save, copy, exit, fbm, nano")
+                    print("Available commands: nt <tag-name> [\"content\"], paste <tag-name>, ct <tag-name>, ls, show, prompt, cls, clear, save, copy, exit, fbm, nano")
 
             except KeyboardInterrupt:
                 continue
@@ -92,4 +92,4 @@ class PromptManager:
     def clear_screen(self):
         clear()
         print("🔨 Prompt Designer Mode")
-        print("Available commands: nt <tag-name> [\"content\"], paste <tag-name>, ct <tag-name>, ls, show, root, cls, clear, save, copy, exit, fbm, nano")
+        print("Available commands: nt <tag-name> [\"content\"], paste <tag-name>, ct <tag-name>, ls, show, prompt, cls, clear, save, copy, exit, fbm, nano")

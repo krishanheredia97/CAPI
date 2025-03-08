@@ -4,7 +4,7 @@ from pathlib import Path
 
 class FileCompleter(Completer):
     def __init__(self):
-        self.root_dir = os.getcwd()
+        self.prompt_dir = os.getcwd()
         
     def should_ignore(self, path: str) -> bool:
         ignore_patterns = {
@@ -30,10 +30,10 @@ class FileCompleter(Completer):
 
     def get_files(self):
         files = []
-        for root, _, filenames in os.walk(self.root_dir):
+        for prompt, _, filenames in os.walk(self.prompt_dir):
             for filename in filenames:
-                full_path = os.path.join(root, filename)
-                rel_path = os.path.relpath(full_path, self.root_dir)
+                full_path = os.path.join(prompt, filename)
+                rel_path = os.path.relpath(full_path, self.prompt_dir)
                 
                 if not self.should_ignore(rel_path) and not self.is_binary(full_path):
                     files.append(rel_path)
