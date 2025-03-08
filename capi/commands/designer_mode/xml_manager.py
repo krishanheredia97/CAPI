@@ -19,6 +19,8 @@ class XMLManager:
             '#ffffff',  # White
         ]
 
+        self.auto_navigate_to_new_tags = True
+
     @property
     def current_path(self):
         return self._current_path
@@ -94,8 +96,16 @@ class XMLManager:
                 new_element.text = "\n"
                 
             print(f"Created new tag: <{tag_name}>")
+            
+            # Add this section for auto-navigation
+            if self.auto_navigate_to_new_tags:
+                self._current_path.append(new_element)
+                print(f"Automatically navigated to <{tag_name}>")
+                
+            return new_element  # Return the new element for reference
         except Exception as e:
             print(f"Error creating element: {str(e)}")
+            return None
 
     def save(self):
         if self.prompt is None:

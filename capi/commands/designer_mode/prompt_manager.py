@@ -68,8 +68,12 @@ class PromptManager:
                     self.enter_file_browser_mode()
                 elif command == "nano":
                     self.xml_manager.edit_with_nano()
+                elif command == "toggle-auto-nav":
+                    self.xml_manager.auto_navigate_to_new_tags = not self.xml_manager.auto_navigate_to_new_tags
+                    status = "enabled" if self.xml_manager.auto_navigate_to_new_tags else "disabled"
+                    print(f"Auto-navigation to new tags {status}")
                 else:
-                    print("Available commands: nt <tag-name> [\"content\"], paste <tag-name>, ct <tag-name>, ls, show, prompt, cls, clear, save, copy, exit, fbm, nano")
+                    print("Available commands: nt <tag-name> [\"content\"], paste <tag-name>, ct <tag-name>, ls, show, prompt, cls, clear, save, copy, exit, fbm, nano, toggle-auto-nav")
 
             except KeyboardInterrupt:
                 continue
