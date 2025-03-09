@@ -251,3 +251,29 @@ class XMLManager:
         finally:
             # Clean up - remove temporary file
             os.unlink(temp_file_path)
+    
+    def remove_tag(self, command):
+        tag_name = command[4:].strip()
+        if not tag_name:
+            print("Error: Tag name is required")
+            return
+        
+        current_element = self._get_current_element()
+        
+        # Find the tag to remove
+        tag_to_remove = None
+        for child in current_element:
+            if child.tag == tag_name:
+                tag_to_remove = child
+                break
+        
+        if tag_to_remove is not None:
+            # If we're currently inside the tag to be removed, move up one level
+            if self._current_path and self._current_path[-1] == tag_to_remove:
+                self._current_path.pop()
+            
+            # Remove the tag
+            current_element.remove(tag_to_remove)
+            print(f"Removed tag: <{tag_name}>")
+        else:
+            print(f"Error: Tag <{tag_name}> not found.")

@@ -12,6 +12,12 @@ class TagCompleter(Completer):
             for tag in tags:
                 if tag.startswith(tag_prefix):
                     yield Completion(tag, start_position=-len(tag_prefix))
+        elif text_before_cursor.startswith("rmt "):
+            tag_prefix = text_before_cursor[4:].strip()
+            tags = self.get_tags_callback()
+            for tag in tags:
+                if tag.startswith(tag_prefix):
+                    yield Completion(tag, start_position=-len(tag_prefix))
         elif text_before_cursor.startswith("nt "):
             if "--".startswith(text_before_cursor[3:].strip()):
                 yield Completion("--str", start_position=-len(text_before_cursor[3:].strip()))

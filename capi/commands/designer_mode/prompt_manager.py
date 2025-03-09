@@ -25,7 +25,8 @@ class PromptManager:
 
     def run(self):
         print("🔨 Prompt Designer Mode")
-        print("Available commands: nt <tag-name> [\"content\"], paste <tag-name>, ct <tag-name>, ls, show, prompt, cls, clear, save, copy, exit, fbm, nano")
+        print("Available commands: nt <tag-name> [\"content\"], paste <tag-name>, ct <tag-name>, rmt <tag-name>, ls, show, prompt, cls, clear, save, copy, exit, fbm, nano")
+
 
 
         while True:
@@ -52,6 +53,8 @@ class PromptManager:
                     self.xml_manager.create_element(command)
                 elif command.startswith("ct "):
                     self.xml_manager.change_tag(command)
+                elif command.startswith("rmt "):
+                    self.xml_manager.remove_tag(command)
                 elif command == "ls":
                     self.xml_manager.list_tags()
                 elif command == "show":
@@ -73,7 +76,7 @@ class PromptManager:
                     status = "enabled" if self.xml_manager.auto_navigate_to_new_tags else "disabled"
                     print(f"Auto-navigation to new tags {status}")
                 else:
-                    print("Available commands: nt <tag-name> [\"content\"], paste <tag-name>, ct <tag-name>, ls, show, prompt, cls, clear, save, copy, exit, fbm, nano, toggle-auto-nav")
+                    print("Available commands: nt <tag-name> [\"content\"], paste <tag-name>, ct <tag-name>, rmt <tag-name>, ls, show, prompt, cls, clear, save, copy, exit, fbm, nano")
 
             except KeyboardInterrupt:
                 continue
@@ -96,4 +99,5 @@ class PromptManager:
     def clear_screen(self):
         clear()
         print("🔨 Prompt Designer Mode")
-        print("Available commands: nt <tag-name> [\"content\"], paste <tag-name>, ct <tag-name>, ls, show, prompt, cls, clear, save, copy, exit, fbm, nano")
+        print("Available commands: nt <tag-name> [\"content\"], paste <tag-name>, ct <tag-name>, rmt <tag-name>, ls, show, prompt, cls, clear, save, copy, exit, fbm, nano")
+
