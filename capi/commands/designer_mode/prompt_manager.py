@@ -25,7 +25,7 @@ class PromptManager:
 
     def run(self):
         print("🔨 Prompt Designer Mode")
-        print("Available commands: nt <tag-name> [\"content\"], paste <tag-name>, ct <tag-name>, rmt <tag-name>, ls, show, prompt, cls, clear, save, copy, exit, fbm, nano")
+        print("Available commands: nt <tag-name> [\"content\"], paste, paste <tag-name>, ct <tag-name>, rmt <tag-name>, ls, show, prompt, cls, clear, save, copy, exit, fbm, nano")
 
 
 
@@ -45,6 +45,10 @@ class PromptManager:
                 elif command == "clear":
                     self.xml_manager.reset()
                     print("Prompt object cleared. Starting from scratch.")
+                elif command.startswith("paste "):
+                    self.clipboard_manager.paste_tag(command, self.xml_manager)
+                elif command == "paste":
+                    self.clipboard_manager.paste_to_current_tag(self.xml_manager)
                 elif command.startswith("paste "):
                     self.clipboard_manager.paste_tag(command, self.xml_manager)
                 elif command == "nt --str":
@@ -76,7 +80,7 @@ class PromptManager:
                     status = "enabled" if self.xml_manager.auto_navigate_to_new_tags else "disabled"
                     print(f"Auto-navigation to new tags {status}")
                 else:
-                    print("Available commands: nt <tag-name> [\"content\"], paste <tag-name>, ct <tag-name>, rmt <tag-name>, ls, show, prompt, cls, clear, save, copy, exit, fbm, nano")
+                    print("Available commands: nt <tag-name> [\"content\"], paste, paste <tag-name>, ct <tag-name>, rmt <tag-name>, ls, show, prompt, cls, clear, save, copy, exit, fbm, nano")
 
             except KeyboardInterrupt:
                 continue
@@ -99,5 +103,5 @@ class PromptManager:
     def clear_screen(self):
         clear()
         print("🔨 Prompt Designer Mode")
-        print("Available commands: nt <tag-name> [\"content\"], paste <tag-name>, ct <tag-name>, rmt <tag-name>, ls, show, prompt, cls, clear, save, copy, exit, fbm, nano")
+        print("Available commands: nt <tag-name> [\"content\"], paste, paste <tag-name>, ct <tag-name>, rmt <tag-name>, ls, show, prompt, cls, clear, save, copy, exit, fbm, nano")
 
