@@ -254,6 +254,29 @@ class XMLManager:
     
     def remove_tag(self, command):
         tag_name = command[4:].strip()
+        
+        # Special case: 'rmt .' removes the current tag
+        if tag_name == '.':
+            if not self._current_path:
+                print("Error: Already at the root level. No tag to remove.")
+                return
+            
+            # Get the tag to be removed (current tag)
+            current_tag = self._current_path[-1]
+            tag_name = current_tag.tag
+            
+            # Move up one level to the parent
+            self._current_path.pop()
+            
+            # Get the parent element
+            parent_element = self._get_current_element()
+            
+            # Remove the tag from its parent
+            parent_element.remove(current_tag)
+            print(f"Removed current tag: <{tag_name}>")
+            return
+        
+        # Regular case: remove a specified tag
         if not tag_name:
             print("Error: Tag name is required")
             return
