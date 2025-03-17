@@ -66,7 +66,7 @@ def process_agent_node(node: Dict[str, Any], context: Dict[str, Any], api_key: s
     input_data = get_input_data(node, context)
 
     # Add question count to the agent's prompt
-    num_questions = context.get("workflow.parameters", {}).get("num_questions", 3)
+    num_questions = context.get("workflow", {}).get("parameters", {}).get("num_questions", 3)
     modified_prompt = f"{agent.system_prompt}\nGenerate exactly {num_questions} questions."
     agent.system_prompt = modified_prompt
 
