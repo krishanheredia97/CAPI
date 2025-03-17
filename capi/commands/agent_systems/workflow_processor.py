@@ -5,19 +5,15 @@ from ...utils.llm_api_caller import LLMApiCaller
 from .system_loader import load_workflow, initialize_agent
 from .parsers.json_extractor import extract_json_response
 
-def execute_workflow(
-    workflow_name: str,
-    user_input: str,
-    api_key: str,
-    parameters: dict = None,
-    verbose: bool = False
-):
+def execute_workflow(workflow_name: str, user_input: str, api_key: str, parameters: dict = None, verbose: bool = False):
     try:
         workflow = load_workflow(workflow_name)
         context = {
             "workflow": {
                 "input": user_input,
-                "parameters": parameters or {}  
+                "parameters": parameters or {},
+                "flow": workflow["flow"],
+                "_workflow_dir": workflow["_workflow_dir"]
             }
         }
         context["workflow"]["flow"] = workflow["flow"]  
@@ -65,7 +61,8 @@ def process_node(node: Dict[str, Any], context: Dict[str, Any], api_key: str, ve
         raise ValueError(f"Unknown node type: {node_type}")
 
 def process_agent_node(node: Dict[str, Any], context: Dict[str, Any], api_key: str, verbose: bool) -> Dict[str, Any]:
-    agent = initialize_agent(node, api_key)
+    workflow_dir = context["workflow"]["_workflow_dir"]
+    agent = initialize_agent(node, api_key, workflow_dir)
     input_data = get_input_data(node, context)
 
     # Add question count to the agent's prompt

@@ -6,16 +6,22 @@ import click
 from ...utils.llm_api_caller import LLMApiCaller
 
 def load_workflow(workflow_name: str) -> Dict[str, Any]:
-    """Load and validate a workflow from JSON file"""
-    workflow_path = Path(f"capi/commands/agent_systems/workflows/{workflow_name}.json")
+    """Load and validate a workflow from directory with config.json"""
+    workflow_dir = Path(f"capi/commands/agent_systems/workflows/{workflow_name}")
+    config_path = workflow_dir / "config.json"
     
-    if not workflow_path.exists():
-        raise FileNotFoundError(f"Workflow file not found: {workflow_path}")
+    if not workflow_dir.is_dir():
+        raise FileNotFoundError(f"Workflow directory not found: {workflow_dir}")
+    
+    if not config_path.exists():
+        raise FileNotFoundError(f"Config file not found in workflow directory: {config_path}")
     
     try:
-        with open(workflow_path, 'r') as f:
+        with open(config_path, 'r') as f:
             workflow = json.load(f)
         
+        # Add directory information to workflow config
+        workflow['_workflow_dir'] = str(workflow_dir.resolve())
         validate_workflow(workflow)
         return workflow
         
@@ -35,6 +41,8 @@ def validate_workflow(workflow: Dict[str, Any]):
     
     # Validate nodes
     node_ids = set()
+    workflow_dir = Path(workflow["_workflow_dir"])
+    
     for node in workflow["flow"]:
         # Check node ID uniqueness
         if node["id"] in node_ids:
@@ -60,10 +68,19 @@ def validate_workflow(workflow: Dict[str, Any]):
         for source in node.get("input_sources", []):
             if not any([source.startswith(f"{nid}.") for nid in node_ids]) and source != "workflow.input":
                 raise ValueError(f"Invalid input source '{source}' in node {node['id']}")
+        
+        # Validate prompt files exist for agent nodes
+        if node["node_type"] in ["soft_agent", "hard_agent"]:
+            if "prompt_file" not in node:
+                raise ValueError(f"Agent node {node['id']} missing 'prompt_file'")
+            
+            prompt_path = workflow_dir / node["prompt_file"]
+            if not prompt_path.exists():
+                raise ValueError(f"Prompt file not found for node {node['id']}: {prompt_path}")
 
-def initialize_agent(node: Dict[str, Any], api_key: str) -> LLMApiCaller:
-    """Create LLMApiCaller instance from node configuration"""
-    prompt_path = Path(f"prompting/cli/{node['prompt_file']}")
+def initialize_agent(node: Dict[str, Any], api_key: str, workflow_dir: str) -> LLMApiCaller:
+    """Create LLMApiCaller instance with workflow-relative paths"""
+    prompt_path = Path(workflow_dir) / node['prompt_file']
     
     if not prompt_path.exists():
         raise FileNotFoundError(f"Prompt file not found: {prompt_path}")

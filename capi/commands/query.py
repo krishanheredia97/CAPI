@@ -1,39 +1,42 @@
 from typing import Optional
 import os
 import click
+import pyperclip
 from dotenv import load_dotenv
 from ..utils.clipboard_utils import get_clipboard_content
-from .agent_systems.workflow_processor import execute_workflow
+from ..commands.agent_systems.workflow_processor import execute_workflow
 
-def handle_query(query: Optional[str], questions: int, verbose: bool, paste: bool):
-    """Execute a complex query workflow using configured agentic systems"""
+def handle_query(query, questions, verbose, paste):
+    """Handle complex query workflow using multiple agents"""
+    # Load environment variables from .env file if it exists
     load_dotenv()
-    api_key = os.getenv("DEEPINFRA_API_TOKEN")
     
-    if not api_key:
-        click.secho("DEEPINFRA_API_TOKEN not set", fg='red')
+    # Set verbose mode as environment variable for other components
+    if verbose:
+        os.environ["VERBOSE"] = "1"
+    
+    if paste:
+        query = pyperclip.paste()
+    
+    if not query:
+        click.secho("Error: No query provided. Please provide a query or use --paste.", fg='red')
         return
-
-    # Handle clipboard input
-    if not query or paste:
-        try:
-            query = get_clipboard_content()
-            if not query.strip():
-                click.secho("Error: Clipboard is empty", fg='red')
-                return
-        except Exception as e:
-            click.secho(f"Error: {str(e)}", fg='red')
-            return
-
-    # Execute the workflow
+    
+    # Try multiple possible API keys
+    api_key = os.environ.get("DEEPINFRA_API_TOKEN") or os.environ.get("OPENAI_API_KEY")
+    if not api_key:
+        click.secho("Error: No API token found. Please set DEEPINFRA_API_TOKEN or OPENAI_API_KEY environment variable.", fg='red')
+        return
+    
+    if verbose:
+        click.secho(f"Using API key (first 4 chars): {api_key[:4]}...", fg='cyan')
+    
+    # Execute the query_processor workflow
+    parameters = {"num_questions": questions}
     try:
-        execute_workflow(
-            workflow_name="query_processor",
-            user_input=query,
-            api_key=api_key,
-            parameters={"num_questions": questions},
-            verbose=verbose
-        )
+        execute_workflow("query_processor", query, api_key, parameters, verbose)
     except Exception as e:
         click.secho(f"Workflow execution failed: {str(e)}", fg='red')
-        raise
+        if verbose:
+            import traceback
+            click.secho(traceback.format_exc(), fg='red')
