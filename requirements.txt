@@ -1,12 +1,10 @@
 annotated-types==0.7.0
 anyio==4.7.0
--e git+ssh://git@github.com/krishanheredia97/CAPI.git@936aa780c053ffa0e71a2fc0a4b295d717ec5eb9#egg=capi
 certifi==2024.12.14
 chardet==5.2.0
 click==8.1.7
 colorama==0.4.6
 distro==1.9.0
--e git+https://github.com/krishanheredia97/ai-cli.git@34b7c0e1feedcac82267f58cd37a2a2aa715a144#egg=gw
 h11==0.14.0
 httpcore==1.0.7
 httpx==0.28.1
