@@ -8,7 +8,7 @@ def extract_json_response(data: str, config: Dict[str, Any]) -> Dict[str, Any]:
     Extract values from JSON data using configured paths
     Args:
         data: Raw JSON string from LLM response
-        config: Extraction configuration from workflow JSON
+        config: Extraction configuration from workflow JSON.
     Returns:
         Dictionary of extracted values
     """
