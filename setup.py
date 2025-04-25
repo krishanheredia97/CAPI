@@ -6,6 +6,11 @@ setup(
     install_requires=[
         "click",
         "pyperclip",
+        "prompt_toolkit",
+        "loguru",
+        "openai",
+        "python-dotenv",
+        "termcolor",
     ],
     entry_points={
         "console_scripts": [
